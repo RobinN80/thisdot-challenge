@@ -1,4 +1,6 @@
 import { Component } from "react";
+import axios from 'axios';
+import User from './user';
 
 class SearchResults extends Component {
   constructor(props) {
@@ -9,40 +11,44 @@ class SearchResults extends Component {
     };
   }
 
-  componentDidMount() {}
-
-  handleSubmit = (event) => {
-    console.log("Current state is:" + JSON.stringify(this.state));
-    alert("Current state is:" + JSON.stringify(this.state));
-
-    event.preventDefault();
-  };
-
   handleChange = (event) => {
     this.setState({ value: event.target.value });
+  };
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+
+    axios.get(`https://api.github.com/users/${this.state.value}`)
+    .then(res => {
+        console.log("handleSubmit response", res.data);
+        this.setState({users: [res.data]});
+    });
+
+    console.log("Current state is:" + JSON.stringify(this.state));
+    // alert("Current state is:" + JSON.stringify(this.state));
   };
 
   render() {
     return (
       <div>
-        {/* Forms from reactjs.org/docs/forms.html */}
+        {/* borrowed code for form from reactjs.org/docs/forms.html */}
         <form onSubmit={this.handleSubmit}>
           <label>
             Search:{" "}
             <input
               type="text"
-              value={this.state.value}
+              placeholder={this.state.value}
               onChange={this.handleChange}
             />
           </label>
           <input type="submit" value="Search" />
         </form>
         <h2>Results:</h2>
-        {/* <div>
+        <div>
           {this.state.users.map((USER) => {
-            return <USER key={USER.id} user={USER} />;
+            return <User key={USER.id} user={USER} />;
           })}
-        </div> */}
+        </div>
       </div>
     );
   }
