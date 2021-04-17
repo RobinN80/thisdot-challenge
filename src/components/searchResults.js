@@ -1,6 +1,7 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import axios from "axios";
 import User from "./user";
+import Pagination from "./pagination";
 
 class SearchResults extends Component {
   constructor(props) {
@@ -9,46 +10,45 @@ class SearchResults extends Component {
       value: "Search GitHub Users",
       users: [],
       loading: false,
+      pageSize: 5,
+      currentPage: 1,
     };
+  }
+  componentDidMount() {
+    // borrowed code below from www.pluralsight.com/guides/axios-vs-fetch
+    axios
+      .get("https://api.github.com/users")
+      .then((res) => {
+        console.log("handleSubmit response", res.data);
+        this.setState({ users: res.data });
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response.data);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
+      });
   }
 
   handleChange = (event) => {
     this.setState({ value: event.target.value });
   };
 
-  handleSubmit = (event) => {
-    
-    // borrowed code below from www.pluralsight.com/guides/axios-vs-fetch
-    axios
-      .get('https://api.github.com/users')
-      .then((res) => {
-        console.log("handleSubmit response", res.data);
-        this.setState({ users: res.data });
-      })
-      .catch(
-        error => {
-            if (error.response) {
-              console.log(error.response.data)
-            } else if (error.request) {
-              console.log(error.request)
-            } else {
-              console.log("Error", error.message)
-            }
-            console.log(error.config)
-          }
-      );
-
-    console.log("Current state is:" + JSON.stringify(this.state));
-    // alert("Current state is:" + JSON.stringify(this.state));
-    event.preventDefault();
+  handlePageChange = (page) => {
+    this.setState({currentPage: page});
   };
 
+
   render() {
-    const { value, users } = this.state;
+    const { value, users, pageSize, currentPage } = this.state;
     return (
       <div>
         {/* borrowed code for form from reactjs.org/docs/forms.html */}
-        <form onSubmit={this.handleSubmit}>
+        <form>
           <label>
             Search:{" "}
             <input
@@ -61,12 +61,15 @@ class SearchResults extends Component {
           <input type="submit" value="Search" />
         </form>
         <h2>Results:</h2>
-        <div>
+        <table>
+          <tr>
+            <th>User Name:</th>
+          </tr>
           {/* borrowed code below From PedroTech youtube channel "Search Filter React Tutorial" */}
           {users
             .filter((USER) => {
-              if (value == "") {
-                return;
+              if (value === "") {
+                return null;
               } else if (
                 USER.login.toLowerCase().includes(value.toLowerCase())
               ) {
@@ -76,7 +79,13 @@ class SearchResults extends Component {
             .map((USER) => {
               return <User key={USER.id} user={USER} />;
             })}
-        </div>
+        </table>
+        <Pagination
+          itemsCount={users.length}
+          pageSize={pageSize}
+          onPageChange={this.handlePageChange}
+          currentPage={currentPage}
+        />
       </div>
     );
   }
