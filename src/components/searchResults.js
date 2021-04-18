@@ -11,7 +11,7 @@ class SearchResults extends Component {
       value: "Search GitHub Users",
       allusers: [],
       loading: false,
-      pageSize: 10,
+      pageSize: 5,
       currentPage: 1,
     };
   }
@@ -53,6 +53,7 @@ class SearchResults extends Component {
         return USER.login;
       }
     });
+
     const usersPaginated = paginate(usersFiltered, currentPage, pageSize);
 
     return (
@@ -74,20 +75,11 @@ class SearchResults extends Component {
         <table>
           <thead>
             <tr>
-              <th>User Name:</th>
+              <th>Profile Pic</th>
+              <th>Username</th>
             </tr>
           </thead>
-          {/* borrowed code below From PedroTech youtube channel "Search Filter React Tutorial" */}
           {usersPaginated
-            // .filter((USER) => {
-            //   if (value === "") {
-            //     return null;
-            //   } else if (
-            //     USER.login.toLowerCase().includes(value.toLowerCase())
-            //   ) {
-            //     return USER.login;
-            //   }
-            // })
             .map((USER) => {
               return <User key={USER.id} user={USER} />;
             })}

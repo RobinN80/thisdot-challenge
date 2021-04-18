@@ -1,4 +1,4 @@
-//import "./App.css";
+import "./App.css";
 import SearchResults from "./components/searchResults";
 
 function App() {

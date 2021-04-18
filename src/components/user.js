@@ -1,13 +1,17 @@
+import { size } from "lodash";
 import React, { Component } from "react";
 
 class User extends Component {
   render() {
-    //console.log("userprops", this.props);
-    const { login, url } = this.props.user;
+    console.log("userprops", this.props);
+    const { login, html_url, avatar_url } = this.props.user;
     return (
       <tr>
         <td>
-          <a href={url}>{login}</a>
+          <img src={avatar_url} alt="profile pic" style={{height: 75, width: 75}}/>
+        </td>
+        <td>
+        <a href={html_url}>{login}</a>
         </td>
       </tr>
     );
