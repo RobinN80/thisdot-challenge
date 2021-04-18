@@ -8,20 +8,24 @@ class SearchResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: "Search GitHub Users",
-      allusers: [],
+      value: "robin",
+      users: [],
       loading: false,
       pageSize: 5,
       currentPage: 1,
+      total_count: 0,
     };
   }
-  componentDidMount() {
+  componentDidUpdate() {
     // borrowed code below from www.pluralsight.com/guides/axios-vs-fetch
     axios
-      .get("https://api.github.com/users")
+      .get(`https://api.github.com/search/users?q=${this.state.value}`)
       .then((res) => {
-        //console.log("handleSubmit response", res.data);
-        this.setState({ allusers: res.data });
+        console.log("get response", res.data);
+        this.setState({
+          users: res.data.items,
+          total_count: res.data.total_count,
+        });
       })
       .catch((error) => {
         if (error.response) {
@@ -35,43 +39,48 @@ class SearchResults extends Component {
       });
   }
 
-  handleChange = (event) => {
+  handleSubmit = (event) => {
+    console.log("Current State is:", +JSON.stringify(this.state));
     this.setState({ value: event.target.value });
   };
+
+//   handlePageChange = (event) => {
+//     this.setState({ value: event.target.value });
+//   };
 
   handlePageChange = (page) => {
     this.setState({ currentPage: page });
   };
 
   render() {
-    const { value, allusers, pageSize, currentPage } = this.state;
+    const { value, users, pageSize, currentPage, total_count } = this.state;
 
-    const usersFiltered = allusers.filter((USER) => {
-      if (value === "") {
-        return [];
-      } else if (USER.login.toLowerCase().includes(value.toLowerCase())) {
-        return USER.login;
-      }
-    });
+    // const usersFiltered = users.filter((USER) => {
+    //   if (value === "") {
+    //     return [];
+    //   } else if (USER.login.toLowerCase().includes(value.toLowerCase())) {
+    //     return USER.login;
+    //   }
+    // });
 
-    const usersPaginated = paginate(usersFiltered, currentPage, pageSize);
+    const usersPaginated = paginate(users, currentPage, pageSize);
 
     return (
       <div>
         {/* borrowed code for form from reactjs.org/docs/forms.html */}
-        <form>
+        <form onSubmit={this.handleSubmit}>
           <label>
             Search:{" "}
             <input
               type="search"
               name="usersearch"
-              placeholder={value}
-              onChange={this.handleChange}
+              placeholder="Search GitHub Users"
+              //onChange={this.handleChange}
             />
           </label>
           <input type="submit" value="Search" />
         </form>
-        <h2>showing {usersFiltered.length} results</h2>
+        <h2>{total_count} results</h2>
         <table>
           <thead>
             <tr>
@@ -79,13 +88,12 @@ class SearchResults extends Component {
               <th>Username</th>
             </tr>
           </thead>
-          {usersPaginated
-            .map((USER) => {
-              return <User key={USER.id} user={USER} />;
-            })}
+          {usersPaginated.map((USER) => {
+            return <User key={USER.id} user={USER} />;
+          })}
         </table>
         <Pagination
-          itemsCount={usersFiltered.length}
+          itemsCount={users.length}
           pageSize={pageSize}
           onPageChange={this.handlePageChange}
           currentPage={currentPage}

@@ -1,4 +1,3 @@
-import { size } from "lodash";
 import React, { Component } from "react";
 
 class User extends Component {
@@ -11,7 +10,7 @@ class User extends Component {
           <img src={avatar_url} alt="profile pic" style={{height: 75, width: 75}}/>
         </td>
         <td>
-        <a href={html_url}>{login}</a>
+        <a href={html_url} target="_blank">{login}</a>
         </td>
       </tr>
     );
