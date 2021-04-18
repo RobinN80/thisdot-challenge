@@ -16,7 +16,7 @@ class SearchResults extends Component {
       total_count: 0,
     };
   }
-  componentDidUpdate() {
+  componentDidMount() {
     // borrowed code below from www.pluralsight.com/guides/axios-vs-fetch
     axios
       .get(`https://api.github.com/search/users?q=${this.state.value}`)
