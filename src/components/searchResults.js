@@ -2,15 +2,16 @@ import React, { Component } from "react";
 import axios from "axios";
 import User from "./user";
 import Pagination from "./pagination";
+import { paginate } from "../utils/paginate";
 
 class SearchResults extends Component {
   constructor(props) {
     super(props);
     this.state = {
       value: "Search GitHub Users",
-      users: [],
+      allusers: [],
       loading: false,
-      pageSize: 5,
+      pageSize: 10,
       currentPage: 1,
     };
   }
@@ -19,8 +20,8 @@ class SearchResults extends Component {
     axios
       .get("https://api.github.com/users")
       .then((res) => {
-        console.log("handleSubmit response", res.data);
-        this.setState({ users: res.data });
+        //console.log("handleSubmit response", res.data);
+        this.setState({ allusers: res.data });
       })
       .catch((error) => {
         if (error.response) {
@@ -39,12 +40,21 @@ class SearchResults extends Component {
   };
 
   handlePageChange = (page) => {
-    this.setState({currentPage: page});
+    this.setState({ currentPage: page });
   };
 
-
   render() {
-    const { value, users, pageSize, currentPage } = this.state;
+    const { value, allusers, pageSize, currentPage } = this.state;
+
+    const usersFiltered = allusers.filter((USER) => {
+      if (value === "") {
+        return [];
+      } else if (USER.login.toLowerCase().includes(value.toLowerCase())) {
+        return USER.login;
+      }
+    });
+    const usersPaginated = paginate(usersFiltered, currentPage, pageSize);
+
     return (
       <div>
         {/* borrowed code for form from reactjs.org/docs/forms.html */}
@@ -60,28 +70,30 @@ class SearchResults extends Component {
           </label>
           <input type="submit" value="Search" />
         </form>
-        <h2>Results:</h2>
+        <h2>showing {usersFiltered.length} results</h2>
         <table>
-          <tr>
-            <th>User Name:</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>User Name:</th>
+            </tr>
+          </thead>
           {/* borrowed code below From PedroTech youtube channel "Search Filter React Tutorial" */}
-          {users
-            .filter((USER) => {
-              if (value === "") {
-                return null;
-              } else if (
-                USER.login.toLowerCase().includes(value.toLowerCase())
-              ) {
-                return USER.login;
-              }
-            })
+          {usersPaginated
+            // .filter((USER) => {
+            //   if (value === "") {
+            //     return null;
+            //   } else if (
+            //     USER.login.toLowerCase().includes(value.toLowerCase())
+            //   ) {
+            //     return USER.login;
+            //   }
+            // })
             .map((USER) => {
               return <User key={USER.id} user={USER} />;
             })}
         </table>
         <Pagination
-          itemsCount={users.length}
+          itemsCount={usersFiltered.length}
           pageSize={pageSize}
           onPageChange={this.handlePageChange}
           currentPage={currentPage}
