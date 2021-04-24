@@ -15,7 +15,6 @@ class SearchResults extends Component {
       total_count: 0,
     };
 
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -66,14 +65,15 @@ class SearchResults extends Component {
     }
   }
 
-  handleSubmit = (event) => {
-    console.log("Current State is:", JSON.stringify(this.state));
+  // handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   console.log("Current State is:", JSON.stringify(this.state));
+  //   this.setState({ value: event.target.value});
+  // };
+
+  handleChange = (event) => {
     this.setState({ value: event.target.value });
   };
-
-    // handleChange = (event) => {
-    //   this.setState({ value: event.target.value });
-    // };
 
   handlePageChange = (page) => {
     this.setState({ currentPage: page });
@@ -97,7 +97,7 @@ class SearchResults extends Component {
               onChange={this.handleChange}
             />
           </label>
-          <input type="submit" value="Search" onSubmit={this.handleSubmit} />
+          <input type="submit" value="Search" />
         </form>
         <h2>{total_count} results</h2>
         <table>
